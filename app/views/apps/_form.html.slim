@@ -1,0 +1,10 @@
+= form_for @app do |f|
+  .form-group
+    = f.label :name
+    = f.text_field :name
+
+  .form-group
+    = f.label :url
+    = f.text_field :url
+
+  = f.submit

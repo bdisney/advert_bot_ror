@@ -1,0 +1,12 @@
+h3
+  | Accounts list
+table.table
+  thead
+    th email
+    th password
+    th Apps
+    th Actions
+  tbody
+    = render @accounts
+br
+= link_to 'Add new  account', new_account_path

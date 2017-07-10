@@ -1,0 +1,17 @@
+= form_for @account do |f|
+  .row
+    .col-md-6
+      .form-group
+        = f.label :email
+        = f.email_field :email, class: 'form-control'
+
+      .form-group
+        = f.label :password
+        = f.text_field :password, class: 'form-control'
+
+      .form-group
+        = f.label :apps, 'Приложения'
+        = f.collection_select :app_ids, App.all, :id, :name, {},
+                {multiple: true, class: "form-control"}
+
+  = f.submit
