@@ -60,10 +60,8 @@ class AdUnitBot < ApplicationRecord
   def app_present?(app)
     DELAY.until { @session.has_link?(CREATE_PLATFORM) }
     begin
-      puts app.inspect
       platform = @session.find(:xpath, "//a[contains(@href, '#{app.platform_id}')]")
     rescue Capybara::ElementNotFound
-      puts platform.inspect
       raise 'Platform id is not found.'
     end
   end
@@ -133,3 +131,10 @@ class AdUnitBot < ApplicationRecord
     "//span[text()='#{@email}']"
   end
 end
+
+
+<div class="pad-setting__url-error _gray-block js-setting-pad_url-error hide">Некорректная ссылка.</div>
+<div class="formMsg js_form_msg js_form_msg">
+<div class="formMsg_title">Ошибка</div>
+                        <div class="formMsg_text">Превышено число попыток входа</div>
+</div>
