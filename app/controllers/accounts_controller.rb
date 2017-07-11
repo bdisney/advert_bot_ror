@@ -1,5 +1,5 @@
 class AccountsController < ApplicationController
-  before_action :set_account, only: [:show, :edit, :update, :destroy]
+  before_action :set_account, only: [:show, :edit, :update, :destroy, :synchronize]
 
   def index
     @accounts = Account.all
@@ -25,7 +25,13 @@ class AccountsController < ApplicationController
   def update
     if @account.update(account_params)
       redirect_to accounts_path, notice: 'Account was updated.'
+    else
+      render :edit
     end
+  end
+
+  def synchronize
+    @account.synhronize
   end
 
   def destroy
