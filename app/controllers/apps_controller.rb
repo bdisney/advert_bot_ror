@@ -22,6 +22,12 @@ class AppsController < ApplicationController
     end
   end
 
+  def update
+    if @app.update(app_params)
+      redirect_to apps_path, notice: 'App was updated.'
+    end
+  end
+
   private
 
   def set_app
@@ -29,6 +35,6 @@ class AppsController < ApplicationController
   end
 
   def app_params
-    params.require(:app).permit(:name, :url)
+    params.require(:app).permit(:name, :url, :platform_id, block_types: [])
   end
 end
