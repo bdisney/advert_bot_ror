@@ -1,5 +1,13 @@
-p
-  = app.name
-p = app.url
+tr
+  td = app.name
+  td = app.url
+  td = app.platform_id
+  td
+    - app.block_types.each do |type|
+      p = type
+  td
+    = link_to 'Show', app
+    = link_to 'Edit', edit_app_path(app)
+    = link_to 'Destroy', app, method: :delete, data: {confirm: 'Are you sure?'}
 
 hr

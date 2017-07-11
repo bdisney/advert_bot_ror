@@ -1,6 +1,14 @@
 h3
   | Applications list
 
-= render @apps
+table.table
+  thead
+    th App name
+    th App url
+    th App platform id
+    th App ad unit types
+    th Actions
+  tbody
+    = render @apps
 
 = link_to 'Add new app', new_app_path

@@ -1,10 +1,23 @@
 = form_for @app do |f|
-  .form-group
-    = f.label :name
-    = f.text_field :name
+  .row
+    .col-md-6
+      .form-group
+        = f.label :name
+        = f.text_field :name, class: 'form-control'
 
-  .form-group
-    = f.label :url
-    = f.text_field :url
+      .form-group
+        = f.label :url
+        = f.text_field :url, class: 'form-control'
+
+      .form-group
+        = f.label :platform_id
+        = f.number_field :platform_id, class: 'form-control'
+
+      .form-group
+        = f.label :apps, 'Ad unit type'
+        = f.select :block_types, App::AD_UNIT_TYPE.map { |type| [ type[1], type[0] ] },
+                { include_blank: false, include_hidden: false  },
+                { multiple: true }
+
 
   = f.submit

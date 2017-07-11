@@ -8,3 +8,6 @@ tr
     = link_to 'Show', account
     = link_to 'Edit', account
     = link_to 'Destroy', account, method: :delete, data: {confirm: 'Are you sure?' }
+
+  td
+    = link_to 'synchronize', synchronize_account_path(account), method: :post

@@ -3,6 +3,9 @@ h3 Application
 p = @app.name
 p = @app.url
 
+- @app.block_types.each do |type|
+  = type
+
 p
   = link_to 'Back', apps_path
   = link_to 'Edit', edit_app_path
