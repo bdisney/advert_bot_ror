@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170710121253) do
+ActiveRecord::Schema.define(version: 20170711115633) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -31,11 +31,17 @@ ActiveRecord::Schema.define(version: 20170710121253) do
     t.index ["app_id"], name: "index_accounts_apps_on_app_id", using: :btree
   end
 
+  create_table "ad_unit_bots", force: :cascade do |t|
+    t.string "target_url"
+  end
+
   create_table "apps", force: :cascade do |t|
     t.string   "name"
     t.string   "url"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.datetime "created_at",               null: false
+    t.datetime "updated_at",               null: false
+    t.string   "block_types", default: [],              array: true
+    t.integer  "platform_id"
   end
 
 end
