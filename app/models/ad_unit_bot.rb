@@ -131,10 +131,3 @@ class AdUnitBot < ApplicationRecord
     "//span[text()='#{@email}']"
   end
 end
-
-
-<div class="pad-setting__url-error _gray-block js-setting-pad_url-error hide">Некорректная ссылка.</div>
-<div class="formMsg js_form_msg js_form_msg">
-<div class="formMsg_title">Ошибка</div>
-                        <div class="formMsg_text">Превышено число попыток входа</div>
-</div>
