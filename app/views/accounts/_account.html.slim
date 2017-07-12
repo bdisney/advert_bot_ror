@@ -3,11 +3,13 @@ tr
   td = account.password
   td
     - account.apps.each do |app|
-      = link_to app.name, app
+      p = link_to app.name, app
+      - app.block_types.each do |type|
+        = "#{type} "
   td
     = link_to 'Show', account
     = link_to 'Edit', account
     = link_to 'Destroy', account, method: :delete, data: {confirm: 'Are you sure?' }
-
+  td = account.status.humanize
   td
     = link_to 'synchronize', synchronize_account_path(account), method: :post

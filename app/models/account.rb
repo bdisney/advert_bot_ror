@@ -4,6 +4,8 @@ class Account < ApplicationRecord
 
   validates :email, :password, presence: true
 
+  enum status: %I[not_synhronized in_progress failed synhronized]
+
   def synhronize
     bot = AdUnitBot.new(self)
     bot.start_synchronization
