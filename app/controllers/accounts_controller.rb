@@ -1,5 +1,6 @@
 class AccountsController < ApplicationController
-  before_action :set_account, only: [:show, :edit, :update, :destroy, :synchronize]
+  before_action :set_account, only: [:show, :edit, :update, :destroy,
+                                     :synchronize, :refresh_status, :show_log]
 
   def index
     @accounts = Account.all
@@ -28,6 +29,17 @@ class AccountsController < ApplicationController
     else
       render :edit
     end
+  end
+
+  def refresh_status
+    respond_to do |format|
+      format.js
+    end
+  end
+
+  def show_log
+    lines = 200
+    @logs = `tail -n #{lines} log/"#{@account.email}".log`
   end
 
   def synchronize

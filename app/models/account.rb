@@ -7,6 +7,10 @@ class Account < ApplicationRecord
   enum status: %I[not_synhronized in_progress failed synhronized]
 
   def synhronize
+    delay.synhronize!
+  end
+
+  def synhronize!
     bot = AdUnitBot.new(self)
     bot.start_synchronization
   end

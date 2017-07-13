@@ -15,28 +15,34 @@ class AdUnitBot < ApplicationRecord
   CREATE_BLOCK    = 'Создать блок'.freeze
 
   def initialize(account)
-    @account = account
-    @email = account.email
-    @password = account.password
-    @session = Capybara::Session.new(:selenium)
+    @account   = account
+    @email     = account.email
+    @password  = account.password
+    @session   = Capybara::Session.new(:selenium)
+    @logger    = Logger.new("#{Rails.root}/log/#{account.email}.log")
   end
 
 
   def start_synchronization
-    puts "Connecting with #{AdUnitBot::TARGET_URL}"
     begin
       connect_to_site
-      @account.apps.each do |app|
-        create_ad_block(app) if app_present?(app)
-      end
+      @account.apps.each { |app| create_ad_block(app) if app_present?(app) }
+
+      @account.synhronized!
       @session.driver.quit
-    rescue RuntimeError => e
-      puts e
+    rescue RuntimeError, Capybara::ElementNotFound => e
+      @logger.error e.message
+      # e.backtrace.each { |line| @logger.error line }
+
+      @account.failed!
       @session.driver.quit
+      @logger.info '***** Session closed. *****'
     end
   end
 
   def connect_to_site
+    @account.in_progress!
+    @logger.info "Connecting with #{AdUnitBot::TARGET_URL}"
     @session.visit TARGET_URL
     DELAY.until { @session.has_xpath?(login_path) }
     @session.has_xpath?(login_path) ? login : (raise RuntimeError 'Connection error')
@@ -48,8 +54,9 @@ class AdUnitBot < ApplicationRecord
     @session.fill_in 'Email или телефон', with: @email
     @session.fill_in 'Пароль', with: @password
 
-    @session.click_button('Sign in')
+    @session.click_button('Войти')
     raise 'Invalid login or password' unless login_successfull?
+    @logger.info 'Loggined in successfully.'
   end
 
   def login_successfull?
@@ -59,43 +66,14 @@ class AdUnitBot < ApplicationRecord
 
   def app_present?(app)
     DELAY.until { @session.has_link?(CREATE_PLATFORM) }
-    begin
-      platform = @session.find(:xpath, "//a[contains(@href, '#{app.platform_id}')]")
-    rescue Capybara::ElementNotFound
-      raise 'Platform id is not found.'
-    end
-  end
-
-  # def new_app
-  #   @session.click_on('Заведите')      if @session.has_content?(WHERE_TO_BEGIN)
-  #   @session.click_on(CREATE_PLATFORM) if @session.has_content?(CREATE_PLATFORM)
-  #
-  #   create_app
-  # end
-
-  # def create_app
-  #   @session.click_on(CREATE_PLATFORM)
-  #   DELAY.until { @session.has_content?('Ссылка на площадку') }
-  #
-  #   @session.fill_in 'Назовите вашу площадку', with: @app_name
-  #   @session.fill_in 'Введите ссылку на площадку', with: @app_name
-  #   DELAY.until { @session.has_content?('Рекламный блок') }
-  #
-  #   choose_block.click
-  #   @session.find(:xpath, "//span[text()='#{CREATE_PLATFORM}']").click
-  #   puts 'New app was successfully created.'
-  # end
-
-  def choose_platform(platform_id)
-    @session.visit TARGET_URL
-    DELAY.until { @session.has_link?(CREATE_PLATFORM) }
-
-    platform = @session.find(:xpath, "//a[contains(@href, '#{platform_id}')]")
-    platform.click
+    platform = @session.find(:xpath, "//a[contains(@href, '#{app.platform_id}')]")
+    raise 'Platform id is not present.' unless platform.present?
+    true
   end
 
   def create_ad_block(app)
     app.block_types.each do |type|
+      @logger.info "Trying create #{type} ad_unit for #{app.name} app."
       choose_platform(app.platform_id)
 
       DELAY.until { @session.has_link?(CREATE_BLOCK) }
@@ -103,16 +81,26 @@ class AdUnitBot < ApplicationRecord
       begin
         DELAY.until { @session.has_content?('Типы блоков') }
       rescue RuntimeError, Capybara::ElementNotFound => e
-        puts e
+        @logger.error e.message
+        @account.failed!
         @session.driver.quit
       end
       choose_block(type).click
       @session.find(:xpath, "//span[text()='Добавить блок']").click
-      puts "#{type.capitalize} ad_unit for #{app.name} was successfully created."
+      @logger.info "#{type.capitalize} ad_unit for #{app.name} was successfully created."
     end
   end
 
   private
+
+  def choose_platform(platform_id)
+    @session.visit TARGET_URL
+    DELAY.until { @session.has_link?(CREATE_PLATFORM) }
+
+    platform = @session.find(:xpath, "//a[contains(@href, '#{platform_id}')]")
+    platform.click
+    @logger.info "Found platform with id: #{platform_id}"
+  end
 
   def choose_block(type)
     if @session.has_content?('Формат размещения больше вам недоступен')
