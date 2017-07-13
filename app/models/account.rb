@@ -1,4 +1,6 @@
 class Account < ApplicationRecord
+  default_scope { order(created_at: :asc) }
+
   has_many :accounts_apps
   has_many :apps, through: :accounts_apps
 
@@ -9,6 +11,8 @@ class Account < ApplicationRecord
   def synhronize
     delay.synhronize!
   end
+
+  private
 
   def synhronize!
     bot = AdUnitBot.new(self)
