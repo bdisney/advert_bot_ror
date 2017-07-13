@@ -1,6 +1,5 @@
 tr
   td = link_to account.email, account
-  td = account.password
   td
     - account.apps.each do |app|
       p = link_to app.name, app

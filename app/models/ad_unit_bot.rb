@@ -1,9 +1,10 @@
 require 'selenium-webdriver'
 require 'capybara'
 require 'capybara/dsl'
+require 'capybara-webkit'
 
 Capybara.run_server = false
-Capybara.current_driver = :selenium
+Capybara.current_driver = :webkit
 
 class AdUnitBot < ApplicationRecord
   include Capybara::DSL
@@ -18,26 +19,24 @@ class AdUnitBot < ApplicationRecord
     @account   = account
     @email     = account.email
     @password  = account.password
-    @session   = Capybara::Session.new(:selenium)
+    @session   = Capybara::Session.new(:webkit)
     @logger    = Logger.new("#{Rails.root}/log/#{account.email}.log")
   end
 
   def start_synchronization
-    begin
-      connect_to_site
-      @account.apps.each { |app| create_ad_block(app) if app_present?(app) }
+    connect_to_site
+    @account.apps.each { |app| create_ad_block(app) if app_present?(app) }
 
-      @account.synhronized!
-      @session.driver.quit
-      @logger.info '***** Session closed. *****'
-    rescue RuntimeError, Capybara::ElementNotFound => e
-      @logger.error e.message
-      # e.backtrace.each { |line| @logger.error line }
+    @account.synhronized!
+    @session.reset!
+    @logger.info '***** Session closed. *****'
+  rescue RuntimeError, Capybara::ElementNotFound => e
+    @logger.error e.message
+    # e.backtrace.each { |line| @logger.error line }
 
-      @account.failed!
-      @session.driver.quit
-      @logger.info '***** Session closed. *****'
-    end
+    @account.failed!
+    @session.reset!
+    @logger.info '***** Session closed. *****'
   end
 
   private
@@ -69,9 +68,10 @@ class AdUnitBot < ApplicationRecord
   def app_present?(app)
     @session.visit TARGET_URL
     DELAY.until { @session.has_link?(CREATE_PLATFORM) }
-    platform = @session.find(:xpath, "//a[contains(@href, '#{app.platform_id}')]")
-    raise 'Platform id is not present.' unless platform.present?
-    true
+    @session.find(:xpath, "//a[contains(@href, '#{app.platform_id}')]")
+  rescue Capybara::ElementNotFound => e
+    @logger.error e.message
+    raise "Platform with id: #{app.platform_id} is not present."
   end
 
   def create_ad_block(app)
@@ -81,15 +81,11 @@ class AdUnitBot < ApplicationRecord
 
       DELAY.until { @session.has_link?(CREATE_BLOCK) }
       @session.click_on(CREATE_BLOCK)
-      begin
-        DELAY.until { @session.has_content?('Типы блоков') }
-      rescue RuntimeError, Capybara::ElementNotFound => e
-        @logger.error e.message
-        @account.failed!
-        @session.driver.quit
-      end
+
+      DELAY.until { @session.has_content?('Типы блоков') }
       choose_block(type).click
       @session.find(:xpath, "//span[text()='Добавить блок']").click
+
       @logger.info "#{type.capitalize} ad_unit for #{app.name} was successfully created."
     end
   end
@@ -105,7 +101,7 @@ class AdUnitBot < ApplicationRecord
 
   def choose_block(type)
     if @session.has_content?('Формат размещения больше вам недоступен')
-      @session.driver.quit
+      @session.reset!
       raise 'Placement format is no longer available'
     else
       @session.find(:xpath, "//span[text()='#{type}']")
