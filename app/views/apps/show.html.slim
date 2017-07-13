@@ -1,11 +1,20 @@
 h3 Application
 
-p = @app.name
-p = @app.url
-
-- @app.block_types.each do |type|
-  = type
+p
+  |App name: #{@app.name}
 
 p
+  |App url: #{@app.url}
+
+p
+  |App platform_id: #{@app.platform_id}
+
+p
+  |App ad_unit block types:
+- @app.block_types.each do |type|
+  li = type
+hr
+p
   = link_to 'Back', apps_path
+  '
   = link_to 'Edit', edit_app_path

@@ -39,7 +39,7 @@ class AccountsController < ApplicationController
 
   def show_log
     lines = 200
-    @logs = `tail -n #{lines} log/"#{@account.email}".log`
+    @log = `tail -n #{lines} log/"#{@account.email}".log`
   end
 
   def synchronize
