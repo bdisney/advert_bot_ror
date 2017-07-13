@@ -22,7 +22,6 @@ class AdUnitBot < ApplicationRecord
     @logger    = Logger.new("#{Rails.root}/log/#{account.email}.log")
   end
 
-
   def start_synchronization
     begin
       connect_to_site
@@ -30,6 +29,7 @@ class AdUnitBot < ApplicationRecord
 
       @account.synhronized!
       @session.driver.quit
+      @logger.info '***** Session closed. *****'
     rescue RuntimeError, Capybara::ElementNotFound => e
       @logger.error e.message
       # e.backtrace.each { |line| @logger.error line }
@@ -39,6 +39,8 @@ class AdUnitBot < ApplicationRecord
       @logger.info '***** Session closed. *****'
     end
   end
+
+  private
 
   def connect_to_site
     @account.in_progress!
@@ -65,6 +67,7 @@ class AdUnitBot < ApplicationRecord
   end
 
   def app_present?(app)
+    @session.visit TARGET_URL
     DELAY.until { @session.has_link?(CREATE_PLATFORM) }
     platform = @session.find(:xpath, "//a[contains(@href, '#{app.platform_id}')]")
     raise 'Platform id is not present.' unless platform.present?
@@ -90,8 +93,6 @@ class AdUnitBot < ApplicationRecord
       @logger.info "#{type.capitalize} ad_unit for #{app.name} was successfully created."
     end
   end
-
-  private
 
   def choose_platform(platform_id)
     @session.visit TARGET_URL
