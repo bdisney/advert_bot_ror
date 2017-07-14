@@ -18,3 +18,5 @@ p
   = link_to 'Back', apps_path
   '
   = link_to 'Edit', edit_app_path
+  '
+  = link_to 'Destroy', app_path(@app), method: :delete, data: {confirm: 'Are you sure?'}

@@ -16,6 +16,7 @@ html
     header
       = render 'shared/nav_bar'
     .container
+      #toastr-messages = custom_flash
       = yield
-      = custom_flash
+
  
