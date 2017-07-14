@@ -16,7 +16,7 @@ class AppsController < ApplicationController
     @app = App.new(app_params)
 
     if @app.save
-      redirect_to @app, notice: 'Application was created'
+      redirect_to @app, notice: 'Application was created.'
     else
       render :new
     end
@@ -26,6 +26,11 @@ class AppsController < ApplicationController
     if @app.update(app_params)
       redirect_to apps_path, notice: 'App was updated.'
     end
+  end
+
+  def destroy
+    @app.destroy
+    redirect_to apps_path, notice: 'App was destroyed.'
   end
 
   private
