@@ -25,6 +25,8 @@ class AppsController < ApplicationController
   def update
     if @app.update(app_params)
       redirect_to apps_path, notice: 'App was updated.'
+    else
+      render :edit
     end
   end
 

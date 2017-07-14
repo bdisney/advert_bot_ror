@@ -2,7 +2,10 @@ h3 Account
 hr
 p email: #{@account.email}
 p password: #{@account.password}
-
+p apps:
+- @account.apps.each do |app|
+  li = app.name
+hr
 p
   = link_to 'Back', accounts_path
   '
