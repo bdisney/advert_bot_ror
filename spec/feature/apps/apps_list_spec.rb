@@ -2,7 +2,7 @@ require 'rails_helper'
 
 feature 'Display list of apps', %q{
   In order to watch list of my apps
-  As a user i want to be able
+  As a user
   I want to be able view app list
 } do
 
