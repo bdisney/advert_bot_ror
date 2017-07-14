@@ -1,24 +1,17 @@
-# README
+Advert Bot
 
-This README would normally document whatever steps are necessary to get the
-application up and running.
+Приложение для синхронизации (авторизация) с сайтом target.my.com и создания рекламных блоков (ad_units) на сайте target.my.com
 
-Things you may want to cover:
+Приложение позволяет создавать и редактировать несколько аккаунтов с неограниченным количеством рекламных площадок (apps) (площадки должны быть предварительно созданы на target.my.com. 
 
-* Ruby version
+Авторизовавшись, бот находит нужную площадку по id и в ней создает рекламные блоки, в соответствии с определенным в приложении формате (типе рекламного блока)
 
-* System dependencies
+Запуск приложения:
 
-* Configuration
+Склонировать репозиторий, изменить файл config/database.yml.sample на config/database.yml
 
-* Database creation
+bundle install
+rake db:create
+rake db:migrate
 
-* Database initialization
-
-* How to run the test suite
-
-* Services (job queues, cache servers, search engines, etc.)
-
-* Deployment instructions
-
-* ...
+rails s; redis-server; sidekiq
