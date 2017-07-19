@@ -6,7 +6,7 @@ require 'capybara-webkit'
 Capybara.run_server = false
 Capybara.current_driver = :webkit
 
-class AdUnitBot < ApplicationRecord
+class AdUnitBot
   include Capybara::DSL
 
   TARGET_URL      = 'https://target-sandbox.my.com'.freeze
